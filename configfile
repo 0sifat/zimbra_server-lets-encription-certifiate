@@ -1,0 +1,47 @@
+====================Lets Encription ++++++++++++++++++++===========================================
+
+
+apt install software-properties-common -y 
+add-apt-repository universe
+add-apt-repository ppa:certbot/certbot
+
+apt-get update -y
+
+apt install certbot --allow-unauthenticated -y 
+
+for multi domain sudo certbot certonly --standalone -d email.veostr.com  -d mail.skyfriendaviation.com  -d mail.amapparelsourcing.com
+
+certbot certonly -d mail.amapparelsourcing.com
+cd /etc/letsencrypt/live/mail.sifat.xyz/
+
+cp privkey.pem /opt/zimbra/ssl/zimbra/commercial/commercial.key 
+cp cert.pem chain.pem /tmp/
+cd /tmp/
+then
+cp chain.pem chain.pem.back
+
+vim chain.pem 
+
+remove 2nd block key ( ------BEGIN CERTIFICATE-----  to -------- END CERTIFICATE----------- )
+
+wget -0 /tmp/ISRG-X1.pem https://letsencrypt.org/certs/isrgrootx1.pem.txt 
+
+it may be saved like ISRG-X1.pem or isrgrootx1.pem.txt 
+
+if ISRG-X1.pem
+
+cat ISRG-X1.pem >> chain.pem
+
+if isrgrootx1.pem.txt
+
+cat isrgrootx1.pem.txt >> chain.pem 
+
+chown zimbra:zimbra /opt/zimbra/ssl/zimbra/commercial/commercial.key
+
+su zimbra -c 'zmcertmgr verifycrt comm /opt/zimbra/ssl/zimbra/commercial/commercial.key /tmp/cert.pem /tmp/chain.pem'
+
+su zimbra -c 'zmcertmgr deploycrt comm  /tmp/cert.pem /tmp/chain.pem'
+
+su zimbra 
+
+zmcontrol restart
